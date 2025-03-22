@@ -13,34 +13,35 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.androidapp.ui.theme.AndroidAppTheme
 
-class MainActivity : ComponentActivity() {
+
+class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            AndroidAppTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                    )
+        setContentView(R.layout.activity_main)
+
+        val viewPager: ViewPager2 = findViewById(R.id.viewPager)
+        val tabLayout: TabLayout = findViewById(R.id.tabLayout)
+
+        viewPager.adapter = object : FragmentStateAdapter(this) {
+            override fun getItemCount() = 2
+            override fun createFragment(position: Int): Fragment {
+                return when (position) {
+                    0 -> QuestFragment()   // クエスト画面
+                    else -> StoryFragment() // ストーリー画面
                 }
             }
         }
-    }
-}
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
+            tab.text = if (position == 0) "クエスト" else "ストーリー"
+            /*
+            tab.icon = if (position == 0) {
+                ContextCompat.getDrawable(this, R.drawable.ic_quest)
+            } else {
+                ContextCompat.getDrawable(this, R.drawable.ic_story)
+            }
+            */
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    AndroidAppTheme {
-        Greeting("Android")
+        }.attach()
     }
 }
